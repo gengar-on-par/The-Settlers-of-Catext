@@ -1,6 +1,10 @@
+#include <ncurses.h>
+#include <unistd.h>
 #include "catan.h"
 
-void Catan::startHex() {
+Catan::Catan(int np) : num_players(np) { }
+
+void Catan::startHex(int start_x, int start_y) {
   move(start_x, start_y);
   printw("\\E______E/");
   move(start_x + 1, start_y);
@@ -15,54 +19,55 @@ void Catan::startHex() {
   printw("\\          /");
   move(start_x + 6, start_y);
   printw("\\E______E/");
-}
+} // startHex()
 
-void Catan::printMap() {
-  startHex();
-}
+void Catan::printMap(int start_x, int start_y) {
+  startHex(start_x, start_y);
+} // printMap()
 
 int main() {
-  // initializing ncurses and the Catan class
+  // Initializing ncurses and the Catan class
   Catan catan(4);
   initscr();
   start_color();
   refresh();
 
-  // creating game logo
+  int x, y;
+  getmaxyx(stdscr, y, x);
+
+  // Center the logo dynamically
+  int logo_start_x = y / 8;
+  int logo_start_y = (x - 115) / 2;
+
+  // Creating game logo
   init_pair(1, COLOR_YELLOW, COLOR_BLACK);
   init_pair(2, COLOR_RED, COLOR_BLACK);
   init_pair(3, COLOR_WHITE, COLOR_BLACK);
-  move(2, 0);
   attron(COLOR_PAIR(1));
-  printw("                   _________         __\n");
-  printw("                   \\_   ___ \\_____ _/  |______\n");
-  printw("                   /    \\  \\/\\__  \\\\   __\\__  \\ \n");
-  printw("                   \\     \\____/ __ \\|  |  / __ \\ \n");
-  printw("                    \\______  (____  /__| (____  \n");
-  printw("                           \\/     \\/          \\/\n");
+  mvprintw(logo_start_x, logo_start_y, "                   _________         __");
+  mvprintw(logo_start_x + 1, logo_start_y, "                   \\_   ___ \\_____ _/  |______");
+  mvprintw(logo_start_x + 2, logo_start_y, "                   /    \\  \\/\\__  \\\\   __\\__  \\ ");
+  mvprintw(logo_start_x + 3, logo_start_y, "                   \\     \\____/ __ \\|  |  / __ \\ ");
+  mvprintw(logo_start_x + 4, logo_start_y, "                    \\______  (____  /__| (____  ");
+  mvprintw(logo_start_x + 5, logo_start_y, "                           \\/     \\/          \\/");
   attron(COLOR_PAIR(2));
-  move(3, 48);
-  printw("  ____   ____  __ _________  ______ ____   ______\n");
-  move(4, 48);
-  printw(" /    \\_/ ___\\|  |  \\_  __ \\/  ___// __ \\ /  ___/\n");
-  move(5, 48);
-  printw("|   |  \\  \\___|  |  /|  | \\/\\___ \\\\  ___/ \\___ \\ \n");
-  move(6, 48);
-  printw("/___|  /\\___  >____/ |__|  /____  >\\___  >____  >\n");
-  move(7, 48);
-  printw("     \\/     \\/                  \\/     \\/     \\/ \n");
+  mvprintw(logo_start_x + 1, logo_start_y + 47, "  ____   ____  __ _________  ______ ____   ______");
+  mvprintw(logo_start_x + 2, logo_start_y + 47, " /    \\_/ ___\\|  |  \\_  __ \\/  ___// __ \\ /  ___/");
+  mvprintw(logo_start_x + 3, logo_start_y + 47, "|   |  \\  \\___|  |  /|  | \\/\\___ \\\\  ___/ \\___ \\ ");
+  mvprintw(logo_start_x + 4, logo_start_y + 47, "/___|  /\\___  >____/ |__|  /____  >\\___  >____  >");
+  mvprintw(logo_start_x + 5, logo_start_y + 47, "     \\/     \\/                  \\/     \\/     \\/ ");
   attron(COLOR_PAIR(3));
-  catan.printMap();
 
-  // creating the map interface
-  int x, y;
-  getmaxyx(stdscr, y, x);
+  // Creating the map interface
   WINDOW *map = nullptr;
   map = newwin(40, 100, (y / 2) - 20, (x / 2) - 50);
   box(map, 0, 0);
   wrefresh(map);
-  
+  catan.printMap((y / 2) - 5, (x / 2) - 5);
+
+  refresh();
+
   getch();
   endwin();
   return 0;
-};
+}; // main()
